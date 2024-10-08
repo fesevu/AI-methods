@@ -59,24 +59,34 @@ class SpeechToTextApp(QMainWindow):
             self.result_area.setText("Пожалуйста, выберите файл.")
 
     def transcribe_with_whisper(self, file_name):
-        url = "https://whisper-speech-to-text1.p.rapidapi.com/speech-to-text"
-        headers = {
-            "x-rapidapi-key": "0ae5ddb63emshf95aca092906310p105a1ajsne284f1fdcd7f",
-            "x-rapidapi-host": "whisper-speech-to-text1.p.rapidapi.com",
-            "Content-Type": "multipart/form-data"
-        }
-        with open(file_name, 'rb') as f:
-            files = {'file': f}
-            response = requests.post(url, files=files, headers=headers)
-            if response.status_code == 200:
-                result = response.json()
-                self.result_area.setText(str(result))
-            else:
-                self.result_area.setText(f"Ошибка: {response.status_code}, {response.text}")
+          url = "https://chatgpt-42.p.rapidapi.com/whisperv3"
+
+          # Открываем файл в бинарном режиме
+          with open(file_name, 'rb') as audio_file:
+                    files = {
+                                'file': (file_name, audio_file)  # Используем имя файла и объект файла
+                    }
+        
+                    headers = {
+                              "x-rapidapi-key": "0ae5ddb63emshf95aca092906310p105a1ajsne284f1fdcd7f",
+                              "x-rapidapi-host": "chatgpt-42.p.rapidapi.com"
+                    }
+
+                    # Отправляем POST-запрос с файлом
+                    response = requests.post(url, files=files, headers=headers)
+
+                    print(response.json())
+
+                    if response.status_code == 200:
+                        result = response.json()
+                        self.result_area.setText(result.get('text', 'Нет текста в ответе.'))
+                    else:
+                        self.result_area.setText(f"Ошибка: {response.status_code}, {response.text}")
 
     def transcribe_with_assembly(self, file_name):
         transcriber = aai.Transcriber()
-        transcript = transcriber.transcribe(file_name, language="ru")
+        config = aai.TranscriptionConfig(language_code="ru")
+        transcript = transcriber.transcribe(file_name, config)
         if transcript.status == aai.TranscriptStatus.error:
                     self.result_area.setText(transcript.error)
         else:
