@@ -18,7 +18,7 @@ def generate_response(user_input: str) -> str:
         max_length=MODEL_PARAMS['max_length'],
         num_return_sequences=MODEL_PARAMS['num_return_sequences'],
         temperature=MODEL_PARAMS['temperature'],
-        top_p=MODEL_PARAMS['top_p'],
+        #top_p=MODEL_PARAMS['top_p'],
         do_sample=MODEL_PARAMS['do_sample'],
         truncation=MODEL_PARAMS['truncation'],
         repetition_penalty=MODEL_PARAMS['repetition_penalty']
