@@ -20,7 +20,6 @@ class ChatWindow(QWidget):
         """
         super().__init__()
         self.init_ui()
-        self.dialog_history: list[str] = []
 
     def init_ui(self) -> None:
         """
@@ -47,17 +46,14 @@ class ChatWindow(QWidget):
         """
         user_input: str = self.chat_input.text().strip()
         if user_input:
-            self.dialog_history.append(f'Вы: {user_input}')
-            dialog_context: str = " ".join(self.dialog_history)
-
             # Логирование пользовательского ввода
             logging.info(f'User: {user_input}')
 
             try:
-                model_response: str = generate_response(dialog_context)
+                # Генерация ответа модели без хранения истории
+                model_response: str = generate_response(user_input)
                 self.chat_output.append(f'Вы: {user_input}')
                 self.chat_output.append(f'ruGPT3Small: {model_response}\n')
-                self.dialog_history.append(f'ruGPT3Small: {model_response}')
 
                 # Логирование ответа модели
                 logging.info(f'ruGPT3Small: {model_response}')
