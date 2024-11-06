@@ -2,6 +2,7 @@ import sys
 from PyQt5.QtWidgets import QApplication
 from interface import ChatWindow
 
+
 def main() -> None:
     """
     Запуск основного приложения.
@@ -10,6 +11,7 @@ def main() -> None:
     chat_window = ChatWindow()
     chat_window.show()
     sys.exit(app.exec_())
+
 
 if __name__ == '__main__':
     main()

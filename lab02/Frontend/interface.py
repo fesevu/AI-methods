@@ -4,11 +4,14 @@ import logging
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QTextEdit, QLineEdit
 
 # Добавляем путь к Model для импорта generation.py
-sys.path.append(os.path.abspath("D:\\Lab_sem_7\\AI methods\\AI-methods\\lab02\\Model"))
+sys.path.append(os.path.abspath(
+    "D:\\Lab_sem_7\\AI methods\\AI-methods\\lab02\\Model"))
 from generation import generate_response
 
 # Настройка логирования
-logging.basicConfig(filename='D:\\Lab_sem_7\\AI methods\\AI-methods\\lab02\\Model\\logs\\chat_log.txt', level=logging.INFO, format='%(asctime)s - %(message)s')
+logging.basicConfig(filename='D:\\Lab_sem_7\\AI methods\\AI-methods\\lab02\\Model\\logs\\chat_log.txt',
+                    level=logging.INFO, format='%(asctime)s - %(message)s', encoding='utf-8')
+
 
 class ChatWindow(QWidget):
     def __init__(self) -> None:
@@ -30,7 +33,8 @@ class ChatWindow(QWidget):
         self.chat_output = QTextEdit()
         self.chat_output.setReadOnly(True)
         self.chat_input = QLineEdit()
-        self.chat_input.setPlaceholderText('Введите сообщение и нажмите Enter...')
+        self.chat_input.setPlaceholderText(
+            'Введите сообщение и нажмите Enter...')
         self.chat_input.returnPressed.connect(self.handle_input)
 
         self.layout.addWidget(self.chat_output)
@@ -61,6 +65,7 @@ class ChatWindow(QWidget):
             except Exception as e:
                 # Логирование ошибок
                 logging.error(f'Error generating response: {e}')
-                self.chat_output.append('Ошибка при генерации ответа. Пожалуйста, попробуйте снова.')
+                self.chat_output.append(
+                    'Ошибка при генерации ответа. Пожалуйста, попробуйте снова.')
 
             self.chat_input.clear()
