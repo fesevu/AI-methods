@@ -1,6 +1,5 @@
 from transformers import pipeline
 from env import MODEL_PARAMS
-import os
 
 # Инициализация модели ruGPT3Small
 chat_model = pipeline(
@@ -17,12 +16,12 @@ def generate_response(user_input: str) -> str:
     response = chat_model(
         user_input,
         max_length=MODEL_PARAMS['max_length'],
-        num_return_sequences=int(os.getenv('NUM_RETURN_SEQUENCES', 1)),
+        num_return_sequences=MODEL_PARAMS['num_return_sequences'],
         temperature=MODEL_PARAMS['temperature'],
         top_p=MODEL_PARAMS['top_p'],
-        do_sample=os.getenv('DO_SAMPLE', 'True').lower() == 'true',
-        truncation=os.getenv('TRUNCATION', 'True').lower() == 'true',
-        repetition_penalty=float(os.getenv('REPETITION_PENALTY', 1.2))
+        do_sample=MODEL_PARAMS['do_sample'],
+        truncation=MODEL_PARAMS['truncation'],
+        repetition_penalty=MODEL_PARAMS['repetition_penalty']
     )
     model_response: str = response[0]['generated_text'][len(
         user_input):].strip()

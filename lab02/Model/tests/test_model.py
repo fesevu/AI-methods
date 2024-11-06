@@ -1,4 +1,8 @@
 import unittest
+import sys
+import os
+sys.path.append(os.path.abspath(
+    "D:\\Lab_sem_7\\AI methods\\AI-methods\\lab02\\Model"))
 from generation import generate_response
 
 
