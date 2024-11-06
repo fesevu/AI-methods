@@ -50,7 +50,7 @@ class ChatWindow(QWidget):
             logging.info(f'User: {user_input}')
 
             try:
-                # Генерация ответа модели без хранения истории
+                # Генерация ответа модели
                 model_response: str = generate_response(user_input)
                 self.chat_output.append(f'Вы: {user_input}')
                 self.chat_output.append(f'ruGPT3Small: {model_response}\n')
