@@ -1,7 +1,10 @@
+import json
 from transformers import pipeline
-from env import MODEL_PARAMS
 
-# Инициализация модели ruGPT3Small
+# Загрузка переменных из файла config.json и инициализация модели ruGPT3Small
+with open('D:\\Lab_sem_7\\AI methods\\AI-methods\\lab02\\Model\\config.json', 'r') as config_file:
+    MODEL_PARAMS = json.load(config_file)
+
 chat_model = pipeline(
     'text-generation', model='ai-forever/rugpt3small_based_on_gpt2')
 
@@ -15,15 +18,7 @@ def generate_response(user_input: str) -> str:
     """
     response = chat_model(
         str(user_input),
-        max_length=MODEL_PARAMS['max_length'],
-        num_return_sequences=MODEL_PARAMS['num_return_sequences'],
-        temperature=MODEL_PARAMS['temperature'],
-        #top_p=MODEL_PARAMS['top_p'],
-        do_sample=MODEL_PARAMS['do_sample'],
-        truncation=MODEL_PARAMS['truncation'],
-        repetition_penalty=MODEL_PARAMS['repetition_penalty'],
-        num_beams=MODEL_PARAMS['num_beams'],
-        no_repeat_ngram_size=MODEL_PARAMS['no_repeat_ngram_size']
+        **MODEL_PARAMS
     )
     model_response: str = response[0]['generated_text'][len(
         user_input):].strip()
