@@ -22,21 +22,23 @@ def transcribe_with_whisper(file_name: str) -> str:
         str: Расшифрованный текст из аудиофайла или сообщение об ошибке.
     """
     print(f"Начало расшифровки Whisper для файла: {file_name}")
-    url = "https://chatgpt-42.p.rapidapi.com/whisperv3"
+    url = "https://openai-whisper-speech-to-text-api.p.rapidapi.com/transcribe"
 
     with open(file_name, 'rb') as audio_file:
         files = {
-            'file': (file_name, audio_file)
+            'file': ('audio.mp3', audio_file),
+            'type': (None, 'RAPID'),
+            'response_format': (None, 'JSON')
         }
 
         headers = {
             "x-rapidapi-key": RAPIDAPI_KEY,
-            "x-rapidapi-host": "chatgpt-42.p.rapidapi.com"
+            "x-rapidapi-host": "openai-whisper-speech-to-text-api.p.rapidapi.com"
         }
 
         try:
             response = requests.post(
-                url, files=files, headers=headers, timeout=180)
+                url, files=files, headers=headers, timeout=60)
             print(
                 f"Получен ответ от Whisper API с кодом статуса: "
                 f"{response.status_code}"
@@ -45,7 +47,7 @@ def transcribe_with_whisper(file_name: str) -> str:
             if response.status_code == 200:
                 result = response.json()
                 print(f"Результат расшифровки: {result}")
-                return result.get('text', 'Текст не найден в ответе.')
+                return result['response'].get('text', 'Текст не найден в ответе.')
             else:
                 print(f"Ошибка при расшифровке Whisper: {response.text}")
                 return f"Ошибка: {response.status_code}, {response.text}"

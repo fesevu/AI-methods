@@ -93,5 +93,5 @@ class SpeechToTextApp(QMainWindow):
         """
         Функция для отображения результата расшифровки.
         """
-        self.result_area.setText(result)
+        self.result_area.setText(result.strip())
         print(f"Результат расшифровки: {result}")
