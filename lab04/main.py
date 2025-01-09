@@ -39,10 +39,10 @@ load_dotenv()
 
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 
-bot = Bot(token=TELEGRAM_BOT_TOKEN)
-router = Router()
-storage = MemoryStorage()
-dp = Dispatcher(storage=storage)
+bot: Bot = Bot(token=TELEGRAM_BOT_TOKEN)
+router: Router = Router()
+storage: MemoryStorage = MemoryStorage()
+dp: Dispatcher = Dispatcher(storage=storage)
 dp.include_router(router)
 
 logging.basicConfig(
@@ -55,7 +55,16 @@ logging.basicConfig(
 logging.info("Бот запущен!")
 
 
-def create_ssl_context():
+def create_ssl_context() -> ssl.SSLContext | None:
+    """
+    Функция для создания SSL-контекста.
+
+    Аргументы:
+        Нет.
+
+    Возвращает:
+        ssl.SSLContext | None: Объект SSL-контекста или None в случае ошибки.
+    """
     try:
         return ssl.create_default_context()
     except Exception as e:
@@ -63,11 +72,20 @@ def create_ssl_context():
         return None
 
 
-ssl_context = create_ssl_context()
+ssl_context: ssl.SSLContext | None = create_ssl_context()
 
 
 @router.message(Command(commands=['start', 'help']))
-async def send_welcome(message: types.Message):
+async def send_welcome(message: types.Message) -> None:
+    """
+    Функция для обработки команд /start и /help.
+
+    Аргументы:
+        message (types.Message): Объект сообщения, содержащего команду.
+
+    Возвращает:
+        None
+    """
     await message.reply(
         "Привет! Я рад видеть тебя и помочь разобраться в мире криптовалют!",
         reply_markup=get_main_menu_keyboard()
@@ -75,7 +93,16 @@ async def send_welcome(message: types.Message):
 
 
 @router.callback_query(lambda c: c.data == "free_chat")
-async def free_chat(callback_query: types.CallbackQuery):
+async def free_chat(callback_query: types.CallbackQuery) -> None:
+    """
+    Функция для обработки нажатия кнопки 'Свободный чат'.
+
+    Аргументы:
+        callback_query (types.CallbackQuery): Объект колбэка с информацией о нажатой кнопке.
+
+    Возвращает:
+        None
+    """
     await callback_query.message.edit_text(
         "Выберите модель для общения:",
         reply_markup=get_model_selection_keyboard()
@@ -84,8 +111,16 @@ async def free_chat(callback_query: types.CallbackQuery):
 
 
 @router.callback_query(lambda c: c.data == "general_questions")
-async def general_questions(callback_query: types.CallbackQuery):
-    """Общие вопросы о криптовалютах."""
+async def general_questions(callback_query: types.CallbackQuery) -> None:
+    """
+    Функция для обработки кнопки 'Общие вопросы о криптовалютах'.
+
+    Аргументы:
+        callback_query (types.CallbackQuery): Объект колбэка.
+
+    Возвращает:
+        None
+    """
     await callback_query.message.edit_text(
         "Общие вопросы о криптовалютах",
         reply_markup=get_general_questions_keyboard()
@@ -94,8 +129,16 @@ async def general_questions(callback_query: types.CallbackQuery):
 
 
 @router.callback_query(lambda c: c.data == "crypto_question")
-async def crypto_question(callback_query: types.CallbackQuery):
-    """Ответ на вопрос 'Что такое криптовалюта'."""
+async def crypto_question(callback_query: types.CallbackQuery) -> None:
+    """
+    Функция для обработки кнопки 'Что такое криптовалюта'.
+
+    Аргументы:
+        callback_query (types.CallbackQuery): Объект колбэка.
+
+    Возвращает:
+        None
+    """
     # Отправляем первое сообщение
     await bot.send_message(
         callback_query.from_user.id,
@@ -111,8 +154,16 @@ async def crypto_question(callback_query: types.CallbackQuery):
 
 
 @router.callback_query(lambda c: c.data == "bitcoin")
-async def bitcoin(callback_query: types.CallbackQuery):
-    """Ответ на вопрос 'Bitcoin'."""
+async def bitcoin(callback_query: types.CallbackQuery) -> None:
+    """
+    Функция для обработки кнопки 'Bitcoin'.
+
+    Аргументы:
+        callback_query (types.CallbackQuery): Объект колбэка.
+
+    Возвращает:
+        None
+    """
     # Отправляем ответ
     await bot.send_message(
         callback_query.from_user.id,
@@ -127,8 +178,16 @@ async def bitcoin(callback_query: types.CallbackQuery):
 
 
 @router.callback_query(lambda c: c.data == "stablecoin")
-async def stablecoin(callback_query: types.CallbackQuery):
-    """Ответ на вопрос 'Стейблкоины'."""
+async def stablecoin(callback_query: types.CallbackQuery) -> None:
+    """
+    Функция для обработки кнопки 'Стейблкоины'.
+
+    Аргументы:
+        callback_query (types.CallbackQuery): Объект колбэка.
+
+    Возвращает:
+        None
+    """
     # Отправляем ответ
     await bot.send_message(
         callback_query.from_user.id,
@@ -136,15 +195,23 @@ async def stablecoin(callback_query: types.CallbackQuery):
     )
     await bot.send_message(
         callback_query.from_user.id,
-        "Основные стейблконины",
+        "Основные стейблкоины",
         reply_markup=get_stablecoin_keyboard()
     )
     await callback_query.answer()
 
 
 @router.callback_query(lambda c: c.data == "usdt")
-async def usdt(callback_query: types.CallbackQuery):
-    """Ответ на вопрос 'USDT'."""
+async def usdt(callback_query: types.CallbackQuery) -> None:
+    """
+    Функция для обработки кнопки 'USDT'.
+
+    Аргументы:
+        callback_query (types.CallbackQuery): Объект колбэка.
+
+    Возвращает:
+        None
+    """
     # Отправляем ответ
     await bot.send_message(
         callback_query.from_user.id,
@@ -159,8 +226,16 @@ async def usdt(callback_query: types.CallbackQuery):
 
 
 @router.callback_query(lambda c: c.data == "usdс")
-async def usdt(callback_query: types.CallbackQuery):
-    """Ответ на вопрос 'USDС'."""
+async def usdc(callback_query: types.CallbackQuery) -> None:
+    """
+    Функция для обработки кнопки 'USDС'.
+
+    Аргументы:
+        callback_query (types.CallbackQuery): Объект колбэка.
+
+    Возвращает:
+        None
+    """
     # Отправляем ответ
     await bot.send_message(
         callback_query.from_user.id,
@@ -175,8 +250,16 @@ async def usdt(callback_query: types.CallbackQuery):
 
 
 @router.callback_query(lambda c: c.data == "altcoins")
-async def altcoins(callback_query: types.CallbackQuery):
-    """Ответ на вопрос 'Альткоины'."""
+async def altcoins(callback_query: types.CallbackQuery) -> None:
+    """
+    Функция для обработки кнопки 'Альткоины'.
+
+    Аргументы:
+        callback_query (types.CallbackQuery): Объект колбэка.
+
+    Возвращает:
+        None
+    """
     # Отправляем ответ
     await bot.send_message(
         callback_query.from_user.id,
@@ -191,8 +274,16 @@ async def altcoins(callback_query: types.CallbackQuery):
 
 
 @router.callback_query(lambda c: c.data == "eth")
-async def eth(callback_query: types.CallbackQuery):
-    """Ответ на вопрос 'Ethereum (ETH)'."""
+async def eth(callback_query: types.CallbackQuery) -> None:
+    """
+    Функция для обработки кнопки 'Ethereum (ETH)'.
+
+    Аргументы:
+        callback_query (types.CallbackQuery): Объект колбэка.
+
+    Возвращает:
+        None
+    """
     # Отправляем ответ
     await bot.send_message(
         callback_query.from_user.id,
@@ -207,8 +298,16 @@ async def eth(callback_query: types.CallbackQuery):
 
 
 @router.callback_query(lambda c: c.data == "ltc")
-async def ltc(callback_query: types.CallbackQuery):
-    """Ответ на вопрос 'Litecoine (LTC)'."""
+async def ltc(callback_query: types.CallbackQuery) -> None:
+    """
+    Функция для обработки кнопки 'Litecoine (LTC)'.
+
+    Аргументы:
+        callback_query (types.CallbackQuery): Объект колбэка.
+
+    Возвращает:
+        None
+    """
     # Отправляем ответ
     await bot.send_message(
         callback_query.from_user.id,
@@ -223,8 +322,16 @@ async def ltc(callback_query: types.CallbackQuery):
 
 
 @router.callback_query(lambda c: c.data == "reg_on_exchange")
-async def reg_on_exchange(callback_query: types.CallbackQuery):
-    """Ответ на вопрос 'Регистрация на бирже'."""
+async def reg_on_exchange(callback_query: types.CallbackQuery) -> None:
+    """
+    Функция для обработки кнопки 'Регистрация на бирже'.
+
+    Аргументы:
+        callback_query (types.CallbackQuery): Объект колбэка.
+
+    Возвращает:
+        None
+    """
     # Отправляем первое сообщение
     await bot.send_message(
         callback_query.from_user.id,
@@ -240,8 +347,16 @@ async def reg_on_exchange(callback_query: types.CallbackQuery):
 
 
 @router.callback_query(lambda c: c.data == "bingx")
-async def bingx(callback_query: types.CallbackQuery):
-    """Ответ на вопрос 'BingX'."""
+async def bingx(callback_query: types.CallbackQuery) -> None:
+    """
+    Функция для обработки кнопки 'BingX'.
+
+    Аргументы:
+        callback_query (types.CallbackQuery): Объект колбэка.
+
+    Возвращает:
+        None
+    """
     # Отправляем ответ
     await bot.send_message(
         callback_query.from_user.id,
@@ -255,8 +370,16 @@ async def bingx(callback_query: types.CallbackQuery):
 
 
 @router.callback_query(lambda c: c.data == "htx")
-async def htx(callback_query: types.CallbackQuery):
-    """Ответ на вопрос 'HTX'."""
+async def htx(callback_query: types.CallbackQuery) -> None:
+    """
+    Функция для обработки кнопки 'HTX'.
+
+    Аргументы:
+        callback_query (types.CallbackQuery): Объект колбэка.
+
+    Возвращает:
+        None
+    """
     # Отправляем ответ
     await bot.send_message(
         callback_query.from_user.id,
@@ -269,24 +392,17 @@ async def htx(callback_query: types.CallbackQuery):
     await callback_query.answer()
 
 
-@router.callback_query(lambda c: c.data == "bingx")
-async def bingx(callback_query: types.CallbackQuery):
-    """Ответ на вопрос 'BingX'."""
-    # Отправляем ответ
-    await bot.send_message(
-        callback_query.from_user.id,
-        "BingX — это централизованная криптовалютная биржа, основанная в 2018 году с головным офисом в Сингапуре. Она предоставляет широкий спектр услуг, включая спотовую и фьючерсную торговлю, копи-трейдинг и сеточную торговлю. Биржа поддерживает более 1000 торговых пар и доступна на нескольких языках, включая русский"
-    )
-    await bot.send_message(
-        callback_query.from_user.id,
-        "https://bingx.com/en/register/"
-    )
-    await callback_query.answer()
-
-
 @router.callback_query(lambda c: c.data == "what_is_kyc")
-async def what_is_kyc(callback_query: types.CallbackQuery):
-    """Ответ на вопрос 'Что такое KYC?'."""
+async def what_is_kyc(callback_query: types.CallbackQuery) -> None:
+    """
+    Функция для обработки кнопки 'Что такое KYC?'.
+
+    Аргументы:
+        callback_query (types.CallbackQuery): Объект колбэка.
+
+    Возвращает:
+        None
+    """
     # Отправляем ответ
     await bot.send_message(
         callback_query.from_user.id,
@@ -301,8 +417,16 @@ async def what_is_kyc(callback_query: types.CallbackQuery):
 
 
 @router.callback_query(lambda c: c.data == "for_what_kyc")
-async def for_what_kyc(callback_query: types.CallbackQuery):
-    """Ответ на вопрос 'Зачем криптобиржам нужен KYC'."""
+async def for_what_kyc(callback_query: types.CallbackQuery) -> None:
+    """
+    Функция для обработки кнопки 'Зачем криптобиржам нужен KYC'.
+
+    Аргументы:
+        callback_query (types.CallbackQuery): Объект колбэка.
+
+    Возвращает:
+        None
+    """
     # Отправляем ответ
     await bot.send_message(
         callback_query.from_user.id,
@@ -324,8 +448,16 @@ async def for_what_kyc(callback_query: types.CallbackQuery):
 
 
 @router.callback_query(lambda c: c.data == "risk_kyc")
-async def risk_kyc(callback_query: types.CallbackQuery):
-    """Ответ на вопрос 'Какие риски связаны с прохождением KYC'."""
+async def risk_kyc(callback_query: types.CallbackQuery) -> None:
+    """
+    Функция для обработки кнопки 'Какие риски связаны с прохождением KYC'.
+
+    Аргументы:
+        callback_query (types.CallbackQuery): Объект колбэка.
+
+    Возвращает:
+        None
+    """
     # Отправляем ответ
     await bot.send_message(
         callback_query.from_user.id,
@@ -354,9 +486,18 @@ async def risk_kyc(callback_query: types.CallbackQuery):
 
 
 @router.callback_query(lambda c: c.data in ["llama3", "gpt_neo"])
-async def choose_model(callback_query: types.CallbackQuery, state: FSMContext):
-    """Обработка выбора модели."""
-    model_name = "LLaMA-3" if callback_query.data == "llama3" else "GPT-Neo"
+async def choose_model(callback_query: types.CallbackQuery, state: FSMContext) -> None:
+    """
+    Функция для обработки выбора модели (LLaMA-3 или GPT-Neo).
+
+    Аргументы:
+        callback_query (types.CallbackQuery): Объект колбэка.
+        state (FSMContext): Контекст машины состояний.
+
+    Возвращает:
+        None
+    """
+    model_name: str = "LLaMA-3" if callback_query.data == "llama3" else "GPT-Neo"
     await state.update_data(model_choice=callback_query.data)
     await bot.send_message(
         callback_query.from_user.id,
@@ -364,15 +505,16 @@ async def choose_model(callback_query: types.CallbackQuery, state: FSMContext):
     )
     await callback_query.answer()
 
+
 # Промпты для моделей
-INTRO_PROMPT_LLAMA = (
+INTRO_PROMPT_LLAMA: str = (
     "Ты помощник в сфере криптовалют. "
     "Твоя задача — отвечать новичкам на вопросы о криптовалютах, "
     "объясняя максимально точно и подробно, но простым языком. "
     "Если пользователь захочет, предоставь дополнительные подробности."
 )
 
-INTRO_PROMPT_GPT_NEO = (
+INTRO_PROMPT_GPT_NEO: str = (
     "You are an assistant specializing in cryptocurrencies. "
     "Your task is to answer beginners' questions about cryptocurrencies, "
     "explaining as accurately and thoroughly as possible in simple terms. "
@@ -380,7 +522,7 @@ INTRO_PROMPT_GPT_NEO = (
 )
 
 # Параметры генерации для каждой модели
-generation_params_llama = {
+generation_params_llama: dict = {
     "max_length": 500,
     "truncation": True,
     "num_return_sequences": 1,
@@ -392,7 +534,7 @@ generation_params_llama = {
     "min_length": 150
 }
 
-generation_params_gpt_neo = {
+generation_params_gpt_neo: dict = {
     "max_new_tokens": 700,
     "truncation": True,
     "num_return_sequences": 1,
@@ -406,81 +548,36 @@ generation_params_gpt_neo = {
 
 
 @router.message()
-async def chat_with_model(message: types.Message, state: FSMContext):
-    """Обработка вопросов и генерация ответов от моделей."""
-    data = await state.get_data()
-    model_choice = data.get("model_choice", "llama3")
-
-    # Выбор промпта и параметров генерации
-    if model_choice == "llama3":
-        full_prompt = f"{INTRO_PROMPT_LLAMA}\n\nВопрос: {
-            message.text}\n\nОтвет:"
-        params = generation_params_llama
-        pipeline = llama3_pipeline
-    else:
-        full_prompt = f"{INTRO_PROMPT_GPT_NEO}\n\nQuestion: {
-            message.text}\n\nAnswer:"
-        params = generation_params_gpt_neo
-        pipeline = gpt_neo_pipeline
-
-    # Генерация ответа
-    response = pipeline(full_prompt, **params)
-    generated_text = response[0]['generated_text'].split(
-        "Answer:" if model_choice == "gpt_neo" else "Ответ:")[-1].strip()
-
-    # Отправляем текст ответа и кнопки
-    await message.answer(
-        f"Ответ от модели {('LLaMA-3' if model_choice ==
-                            'llama3' else 'GPT-Neo')}:\n\n{generated_text}",
-        reply_markup=get_models_back_keyboard()
-    )
-
-
-@router.callback_query(lambda c: c.data == "main_menu")
-async def back_to_main_menu(callback_query: types.CallbackQuery):
-    """Возврат в Главное меню."""
-    await callback_query.message.edit_text(
-        "Главное меню",
-        reply_markup=get_main_menu_keyboard()
-    )
-    await callback_query.answer()
-
-INTRO_PROMPT_LLAMA = (
-    "Ты помощник в сфере криптовалют.Твоя задача — отвечать новичкам на вопросы о криптовалютах, объясняя максимально точно и подробно, но простым языком.Если пользователь захочет, предоставь дополнительные подробности."
-)
-
-INTRO_PROMPT_GPT_NEO = (
-    # "You are an assistant specializing in cryptocurrencies. Your task is to answer beginners' questions about cryptocurrencies,explaining as accurately and thoroughly as possible in simple terms. Provide additional details if requested."
-    "Ты помощник в сфере криптовалют.Твоя задача — отвечать новичкам на вопросы о криптовалютах, объясняя максимально точно и подробно, но простым языком.Если пользователь захочет, предоставь дополнительные подробности."
-)
-
-
-@router.message()
-async def chat_with_model(message: types.Message, state: FSMContext):
+async def chat_with_model(message: types.Message, state: FSMContext) -> None:
     """
     Генерация ответа модели на основе текущего ввода пользователя.
 
-    : param user_input: Ввод пользователя, на основе которого генерируется ответ.
-    : return: Ответ модели на текущий запрос.
+    Аргументы:
+        message (types.Message): Объект сообщения от пользователя.
+        state (FSMContext): Контекст машины состояний.
+
+    Возвращает:
+        None
     """
-    data = await state.get_data()
-    model_choice = data.get("model_choice", "llama3")
+    data: dict = await state.get_data()
+    model_choice: str = data.get("model_choice", "llama3")
 
+    # Выбор промпта и параметров генерации
     if model_choice == "llama3":
-        full_prompt = f"{INTRO_PROMPT_LLAMA}\n\nВопрос: {
+        full_prompt: str = f"{INTRO_PROMPT_LLAMA}\n\nВопрос: {
             message.text}\n\nОтвет:"
-        params = generation_params_llama
-        model_pipeline = llama3_pipeline
-        split_token = "Ответ:"
+        params: dict = generation_params_llama
+        pipeline = llama3_pipeline
+        split_token: str = "Ответ:"
     else:
-        full_prompt = f"{INTRO_PROMPT_GPT_NEO}\n\nQuestion: {
+        full_prompt: str = f"{INTRO_PROMPT_GPT_NEO}\n\nQuestion: {
             message.text}\n\nAnswer:"
-        params = generation_params_gpt_neo
-        model_pipeline = gpt_neo_pipeline
-        split_token = "Answer:"
+        params: dict = generation_params_gpt_neo
+        pipeline = gpt_neo_pipeline
+        split_token: str = "Answer:"
 
-    response = model_pipeline(full_prompt, **params)
-    generated_text = response[0]["generated_text"].split(
+    response: list = pipeline(full_prompt, **params)
+    generated_text: str = response[0]["generated_text"].split(
         split_token)[-1].strip()
 
     await message.answer(
@@ -490,11 +587,89 @@ async def chat_with_model(message: types.Message, state: FSMContext):
     )
 
 
-async def main():
-    connector = TCPConnector(ssl=ssl_context)
+@router.callback_query(lambda c: c.data == "main_menu")
+async def back_to_main_menu(callback_query: types.CallbackQuery) -> None:
+    """
+    Функция для обработки кнопки 'Главное меню'.
+
+    Аргументы:
+        callback_query (types.CallbackQuery): Объект колбэка.
+
+    Возвращает:
+        None
+    """
+    await callback_query.message.edit_text(
+        "Главное меню",
+        reply_markup=get_main_menu_keyboard()
+    )
+    await callback_query.answer()
+
+
+INTRO_PROMPT_LLAMA = (
+    "Ты помощник в сфере криптовалют.Твоя задача — отвечать новичкам на вопросы о криптовалютах, "
+    "объясняя максимально точно и подробно, но простым языком.Если пользователь захочет, предоставь дополнительные подробности."
+)
+
+INTRO_PROMPT_GPT_NEO = (
+    "Ты помощник в сфере криптовалют.Твоя задача — отвечать новичкам на вопросы о криптовалютах, "
+    "объясняя максимально точно и подробно, но простым языком.Если пользователь захочет, предоставь дополнительные подробности."
+)
+
+
+@router.message()
+async def chat_with_model(message: types.Message, state: FSMContext) -> None:
+    """
+    Генерация ответа модели на основе текущего ввода пользователя.
+
+    Аргументы:
+        message (types.Message): Объект сообщения от пользователя.
+        state (FSMContext): Контекст машины состояний.
+
+    Возвращает:
+        None
+    """
+    data: dict = await state.get_data()
+    model_choice: str = data.get("model_choice", "llama3")
+
+    if model_choice == "llama3":
+        full_prompt: str = f"{INTRO_PROMPT_LLAMA}\n\nВопрос: {
+            message.text}\n\nОтвет:"
+        params: dict = generation_params_llama
+        model_pipeline = llama3_pipeline
+        split_token: str = "Ответ:"
+    else:
+        full_prompt: str = f"{INTRO_PROMPT_GPT_NEO}\n\nQuestion: {
+            message.text}\n\nAnswer:"
+        params: dict = generation_params_gpt_neo
+        model_pipeline = gpt_neo_pipeline
+        split_token: str = "Answer:"
+
+    response: list = model_pipeline(full_prompt, **params)
+    generated_text: str = response[0]["generated_text"].split(
+        split_token)[-1].strip()
+
+    await message.answer(
+        f"Ответ от модели {'LLaMA-3' if model_choice ==
+                           'llama3' else 'GPT-Neo'}:\n\n{generated_text}",
+        reply_markup=get_models_back_keyboard()
+    )
+
+
+async def main() -> None:
+    """
+    Главная асинхронная функция запуска бота.
+
+    Аргументы:
+        Нет.
+
+    Возвращает:
+        None
+    """
+    connector: TCPConnector = TCPConnector(ssl=ssl_context)
     async with aiohttp.ClientSession(connector=connector) as session:
-        bot._session = session
+        bot._session = session  # Устанавливаем сессию для бота
         await dp.start_polling(bot)
+
 
 if __name__ == "__main__":
     asyncio.run(main())
