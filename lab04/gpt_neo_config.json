@@ -1,0 +1,11 @@
+{
+          "max_new_tokens": 400,
+          "truncation": false,
+          "num_return_sequences": 1,
+          "repetition_penalty": 1.5,
+          "temperature": 0.3,
+          "top_k": 100,
+          "top_p": 0.6,
+          "do_sample": true,
+          "min_length": 200
+}

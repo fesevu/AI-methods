@@ -1,16 +1,51 @@
+"""
+Главная точка входа в приложение.
+"""
+
+import os
+import ssl
+import json
 import logging
 import asyncio
-from aiogram import Bot, Dispatcher, types
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-from aiogram import Router
-from aiogram.fsm.context import FSMContext
-from aiogram.fsm.storage.memory import MemoryStorage
-from aiogram.filters import Command
-from transformers import pipeline
-import ssl
 import aiohttp
 
-# Workaround to ensure aiohttp works without SSL issues
+from aiogram import Bot, Dispatcher, Router, types
+from aiogram.filters import Command
+from aiogram.fsm.context import FSMContext
+from aiogram.fsm.storage.memory import MemoryStorage
+from dotenv import load_dotenv
+from aiohttp import TCPConnector
+
+from models import (
+    llama3_pipeline, gpt_neo_pipeline,
+    generation_params_llama, generation_params_gpt_neo
+)
+from keyboards import (
+    get_main_menu_keyboard,
+    get_model_selection_keyboard,
+    get_altcoins_back_keyboard,
+    get_bitcoin_keyboard,
+    get_what_is_kyc_keyboard,
+    get_altcoins_keyboard,
+    get_crypto_types_keyboard,
+    get_general_questions_keyboard,
+    get_kyc_back_keyboard,
+    get_reg_on_exchange_keyboard,
+    get_stablecoin_keyboard,
+    get_usd_keyboard,
+    get_models_back_keyboard
+)
+
+load_dotenv()
+
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+
+bot = Bot(token=TELEGRAM_BOT_TOKEN)
+logging.basicConfig(level=logging.INFO)
+router = Router()
+storage = MemoryStorage()
+dp = Dispatcher(storage=storage)
+dp.include_router(router)
 
 
 def create_ssl_context():
@@ -22,249 +57,21 @@ def create_ssl_context():
 
 
 ssl_context = create_ssl_context()
-aiohttp.connector.DefaultSelectorEventLoopPolicy = asyncio.DefaultEventLoopPolicy
-
-# Telegram Bot Token
-TELEGRAM_BOT_TOKEN = "8116977630:AAEwJB97I6JFwd3IVDAbClq8NBsn3oiGs8Q"
-
-# Initialize transformers pipelines with chat message structure
-llama3_pipeline = pipeline(
-    "text-generation",
-    model="unsloth/Llama-3.2-1B"
-)
-gpt_neo_pipeline = pipeline("text-generation", model="EleutherAI/gpt-neo-1.3B")
-
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-
-# Initialize bot and dispatcher
-bot = Bot(token=TELEGRAM_BOT_TOKEN)
-storage = MemoryStorage()
-router = Router()
-dp = Dispatcher(storage=storage)
-dp.include_router(router)
-
-# Главная клавиатура
-main_keyboard = InlineKeyboardMarkup(
-    inline_keyboard=[
-        [
-            InlineKeyboardButton(text="Общие вопросы",
-                                 callback_data="general_questions")
-        ],
-        [
-            InlineKeyboardButton(text="Свободное общение",
-                                 callback_data="free_chat")
-        ]
-    ]
-)
-
-# Клавиатура для выбора модели
-model_selection_keyboard = InlineKeyboardMarkup(
-    inline_keyboard=[
-        [
-            InlineKeyboardButton(text="Общение с LLaMA-3",
-                                 callback_data="llama3"),
-            InlineKeyboardButton(text="Общение с GPT-Neo",
-                                 callback_data="gpt_neo"),
-        ],
-        [
-            InlineKeyboardButton(text="🔙 В Главное меню",
-                                 callback_data="main_menu")
-        ]
-    ]
-)
-
-# Клавиатура для общих вопросов
-general_questions_keyboard = InlineKeyboardMarkup(
-    inline_keyboard=[
-        [
-            InlineKeyboardButton(text="Что такое криптовалюта",
-                                 callback_data="crypto_question"),
-            InlineKeyboardButton(text="Регистрация на бирже",
-                                 callback_data="reg_on_exchange"),
-        ],
-        [
-            InlineKeyboardButton(text="🔙 В Главное меню",
-                                 callback_data="main_menu")
-        ]
-    ]
-)
-
-# Клавиатура для видов криптовалют
-crypto_types_keyboard = InlineKeyboardMarkup(
-    inline_keyboard=[
-        [
-            InlineKeyboardButton(text="Стейблкоины",
-                                 callback_data="stablecoins"),
-            InlineKeyboardButton(text="Альткоины",
-                                 callback_data="altcoins"),
-            InlineKeyboardButton(text="Bitcoin",
-                                 callback_data="bitcoin"),
-        ],
-        [
-            InlineKeyboardButton(text="🔙 Назад",
-                                 callback_data="general_questions"),
-            InlineKeyboardButton(text="🔝 Главное меню",
-                                 callback_data="main_menu")
-        ]
-    ]
-)
-
-# Клавиатура для биткоина
-bitcoin_keyboard = InlineKeyboardMarkup(
-    inline_keyboard=[
-        [
-            InlineKeyboardButton(text="🔙 Назад",
-                                 callback_data="crypto_question")
-        ],
-        [
-            InlineKeyboardButton(text="🔝 Главное меню",
-                                 callback_data="main_menu")
-        ]
-    ]
-)
-
-# Клавиатура для стейблкоинов
-stablecoin_keyboard = InlineKeyboardMarkup(
-    inline_keyboard=[
-        [
-            InlineKeyboardButton(text="USDT",
-                                 callback_data="usdt"),
-            InlineKeyboardButton(text="USDC",
-                                 callback_data="usdc")
-        ],
-        [
-            InlineKeyboardButton(text="🔙 Назад",
-                                 callback_data="crypto_question")
-        ],
-        [
-            InlineKeyboardButton(text="🔝 Главное меню",
-                                 callback_data="main_menu")
-        ]
-    ]
-)
-
-
-# Клавиатура для usdt и usdc
-usd_keyboard = InlineKeyboardMarkup(
-    inline_keyboard=[
-        [
-            InlineKeyboardButton(text="🔙 Назад",
-                                 callback_data="stablecoin")
-        ],
-        [
-            InlineKeyboardButton(text="🔝 Главное меню",
-                                 callback_data="main_menu")
-        ]
-    ]
-)
-
-# Клавиатура для алткоинов
-altcoins_keyboard = InlineKeyboardMarkup(
-    inline_keyboard=[
-        [
-            InlineKeyboardButton(text="Ethereum (ETH)",
-                                 callback_data="eth"),
-            InlineKeyboardButton(text="Litecoin (LTC)",
-                                 callback_data="ltc")
-        ],
-        [
-            InlineKeyboardButton(text="🔙 Назад",
-                                 callback_data="crypto_question")
-        ],
-        [
-            InlineKeyboardButton(text="🔝 Главное меню",
-                                 callback_data="main_menu")
-        ]
-    ]
-)
-
-# Клавиатура для eth и ltc
-altcoins_back_keyboard = InlineKeyboardMarkup(
-    inline_keyboard=[
-        [
-            InlineKeyboardButton(text="🔙 Назад",
-                                 callback_data="altcoins")
-        ],
-        [
-            InlineKeyboardButton(text="🔝 Главное меню",
-                                 callback_data="main_menu")
-        ]
-    ]
-)
-
-# Клавиатура для регистрации на бирже
-reg_on_exchange_keyboard = InlineKeyboardMarkup(
-    inline_keyboard=[
-        [
-            InlineKeyboardButton(text="BingX",
-                                 callback_data="bingx"),
-            InlineKeyboardButton(text="HTX",
-                                 callback_data="htx"),
-        ],
-        [
-            InlineKeyboardButton(text="Что такое KYC?",
-                                 callback_data="what_is_kyc"),
-        ],
-        [
-            InlineKeyboardButton(text="🔙 Назад",
-                                 callback_data="general_questions"),
-            InlineKeyboardButton(text="🔝 Главное меню",
-                                 callback_data="main_menu")
-        ]
-    ]
-)
-
-# клавиатура для Что такое KYC?
-reg_on_exchange_keyboard = InlineKeyboardMarkup(
-    inline_keyboard=[
-        [
-            InlineKeyboardButton(text="Зачем криптобиржам нужен KYC",
-                                 callback_data="for_what_kyc"),
-        ],
-        [
-            InlineKeyboardButton(text="Какие риски связаны с прохождением KYC",
-                                 callback_data="risk_kyc"),
-        ],
-        [
-            InlineKeyboardButton(text="🔙 Назад",
-                                 callback_data="reg_on_exchange"),
-            InlineKeyboardButton(text="🔝 Главное меню",
-                                 callback_data="main_menu")
-        ]
-    ]
-)
-
-# Клавиатура для возврата к Что такое kyc
-kyc_back_keyboard = InlineKeyboardMarkup(
-    inline_keyboard=[
-        [
-            InlineKeyboardButton(text="🔙 Назад",
-                                 callback_data="what_is_kyc")
-        ],
-        [
-            InlineKeyboardButton(text="🔝 Главное меню",
-                                 callback_data="main_menu")
-        ]
-    ]
-)
 
 
 @router.message(Command(commands=['start', 'help']))
 async def send_welcome(message: types.Message):
-    """Обработка команды /start."""
     await message.reply(
         "Привет! Я рад видеть тебя и помочь разобраться в мире криптовалют!",
-        reply_markup=main_keyboard
+        reply_markup=get_main_menu_keyboard()
     )
 
 
 @router.callback_query(lambda c: c.data == "free_chat")
 async def free_chat(callback_query: types.CallbackQuery):
-    """Свободное общение: переход к выбору модели."""
     await callback_query.message.edit_text(
         "Выберите модель для общения:",
-        reply_markup=model_selection_keyboard
+        reply_markup=get_model_selection_keyboard()
     )
     await callback_query.answer()
 
@@ -274,7 +81,7 @@ async def general_questions(callback_query: types.CallbackQuery):
     """Общие вопросы о криптовалютах."""
     await callback_query.message.edit_text(
         "Общие вопросы о криптовалютах",
-        reply_markup=general_questions_keyboard
+        reply_markup=get_general_questions_keyboard()
     )
     await callback_query.answer()
 
@@ -291,7 +98,7 @@ async def crypto_question(callback_query: types.CallbackQuery):
     await bot.send_message(
         callback_query.from_user.id,
         "Виды криптовалют",
-        reply_markup=crypto_types_keyboard
+        reply_markup=get_crypto_types_keyboard()
     )
     await callback_query.answer()
 
@@ -307,7 +114,7 @@ async def bitcoin(callback_query: types.CallbackQuery):
     await bot.send_message(
         callback_query.from_user.id,
         "Возврат",
-        reply_markup=bitcoin_keyboard
+        reply_markup=get_bitcoin_keyboard()
     )
     await callback_query.answer()
 
@@ -323,7 +130,7 @@ async def stablecoin(callback_query: types.CallbackQuery):
     await bot.send_message(
         callback_query.from_user.id,
         "Основные стейблконины",
-        reply_markup=stablecoin_keyboard
+        reply_markup=get_stablecoin_keyboard()
     )
     await callback_query.answer()
 
@@ -339,7 +146,7 @@ async def usdt(callback_query: types.CallbackQuery):
     await bot.send_message(
         callback_query.from_user.id,
         "Возврат",
-        reply_markup=usd_keyboard
+        reply_markup=get_usd_keyboard()
     )
     await callback_query.answer()
 
@@ -355,7 +162,7 @@ async def usdt(callback_query: types.CallbackQuery):
     await bot.send_message(
         callback_query.from_user.id,
         "Возврат",
-        reply_markup=usd_keyboard
+        reply_markup=get_usd_keyboard()
     )
     await callback_query.answer()
 
@@ -371,7 +178,7 @@ async def altcoins(callback_query: types.CallbackQuery):
     await bot.send_message(
         callback_query.from_user.id,
         "Альткоины",
-        reply_markup=altcoins_keyboard
+        reply_markup=get_altcoins_keyboard()
     )
     await callback_query.answer()
 
@@ -387,7 +194,7 @@ async def eth(callback_query: types.CallbackQuery):
     await bot.send_message(
         callback_query.from_user.id,
         "Возврат",
-        reply_markup=altcoins_back_keyboard
+        reply_markup=get_altcoins_back_keyboard()
     )
     await callback_query.answer()
 
@@ -403,7 +210,7 @@ async def ltc(callback_query: types.CallbackQuery):
     await bot.send_message(
         callback_query.from_user.id,
         "Возврат",
-        reply_markup=altcoins_back_keyboard
+        reply_markup=get_altcoins_back_keyboard()
     )
     await callback_query.answer()
 
@@ -420,7 +227,7 @@ async def reg_on_exchange(callback_query: types.CallbackQuery):
     await bot.send_message(
         callback_query.from_user.id,
         "Список бирж",
-        reply_markup=reg_on_exchange_keyboard
+        reply_markup=get_reg_on_exchange_keyboard()
     )
     await callback_query.answer()
 
@@ -481,7 +288,7 @@ async def what_is_kyc(callback_query: types.CallbackQuery):
     await bot.send_message(
         callback_query.from_user.id,
         "Подробнее",
-        reply_markup=altcoins_back_keyboard
+        reply_markup=get_altcoins_back_keyboard()
     )
     await callback_query.answer()
 
@@ -504,7 +311,7 @@ async def for_what_kyc(callback_query: types.CallbackQuery):
     await bot.send_message(
         callback_query.from_user.id,
         "Возврат",
-        reply_markup=kyc_back_keyboard
+        reply_markup=get_kyc_back_keyboard()
     )
     await callback_query.answer()
 
@@ -534,7 +341,7 @@ async def risk_kyc(callback_query: types.CallbackQuery):
     await bot.send_message(
         callback_query.from_user.id,
         "Возврат",
-        reply_markup=kyc_back_keyboard
+        reply_markup=get_kyc_back_keyboard()
     )
     await callback_query.answer()
 
@@ -614,42 +421,73 @@ async def chat_with_model(message: types.Message, state: FSMContext):
     generated_text = response[0]['generated_text'].split(
         "Answer:" if model_choice == "gpt_neo" else "Ответ:")[-1].strip()
 
-    # Клавиатура для возврата
-    back_keyboard = InlineKeyboardMarkup(
-        inline_keyboard=[
-            [
-                InlineKeyboardButton(
-                    text="🔙 Назад", callback_data="free_chat"),
-                InlineKeyboardButton(
-                    text="🔝 В Главное меню", callback_data="main_menu")
-            ]
-        ]
-    )
-
     # Отправляем текст ответа и кнопки
     await message.answer(
         f"Ответ от модели {('LLaMA-3' if model_choice ==
                             'llama3' else 'GPT-Neo')}:\n\n{generated_text}",
-        reply_markup=back_keyboard
+        reply_markup=get_models_back_keyboard()
     )
 
 
 @router.callback_query(lambda c: c.data == "main_menu")
 async def back_to_main_menu(callback_query: types.CallbackQuery):
-    """Возврат в 🔝 Главное меню."""
+    """Возврат в Главное меню."""
     await callback_query.message.edit_text(
-        "🔝 Главное меню",
-        reply_markup=main_keyboard
+        "Главное меню",
+        reply_markup=get_main_menu_keyboard()
     )
     await callback_query.answer()
 
+INTRO_PROMPT_LLAMA = (
+    "Ты помощник в сфере криптовалют.Твоя задача — отвечать новичкам на вопросы о криптовалютах, объясняя максимально точно и подробно, но простым языком.Если пользователь захочет, предоставь дополнительные подробности."
+)
+
+INTRO_PROMPT_GPT_NEO = (
+    # "You are an assistant specializing in cryptocurrencies. Your task is to answer beginners' questions about cryptocurrencies,explaining as accurately and thoroughly as possible in simple terms. Provide additional details if requested."
+    "Ты помощник в сфере криптовалют.Твоя задача — отвечать новичкам на вопросы о криптовалютах, объясняя максимально точно и подробно, но простым языком.Если пользователь захочет, предоставь дополнительные подробности."
+)
+
+
+@router.message()
+async def chat_with_model(message: types.Message, state: FSMContext):
+    """
+    Генерация ответа модели на основе текущего ввода пользователя.
+
+    : param user_input: Ввод пользователя, на основе которого генерируется ответ.
+    : return: Ответ модели на текущий запрос.
+    """
+    data = await state.get_data()
+    model_choice = data.get("model_choice", "llama3")
+
+    if model_choice == "llama3":
+        full_prompt = f"{INTRO_PROMPT_LLAMA}\n\nВопрос: {
+            message.text}\n\nОтвет:"
+        params = generation_params_llama
+        model_pipeline = llama3_pipeline
+        split_token = "Ответ:"
+    else:
+        full_prompt = f"{INTRO_PROMPT_GPT_NEO}\n\nQuestion: {
+            message.text}\n\nAnswer:"
+        params = generation_params_gpt_neo
+        model_pipeline = gpt_neo_pipeline
+        split_token = "Answer:"
+
+    response = model_pipeline(full_prompt, **params)
+    generated_text = response[0]["generated_text"].split(
+        split_token)[-1].strip()
+
+    await message.answer(
+        f"Ответ от модели {'LLaMA-3' if model_choice ==
+                           'llama3' else 'GPT-Neo'}:\n\n{generated_text}",
+        reply_markup=get_models_back_keyboard()
+    )
+
 
 async def main():
-    """Запуск бота."""
-    connector = aiohttp.TCPConnector(ssl=ssl_context)
+    connector = TCPConnector(ssl=ssl_context)
     async with aiohttp.ClientSession(connector=connector) as session:
         bot._session = session
         await dp.start_polling(bot)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     asyncio.run(main())
