@@ -4,7 +4,6 @@
 
 import os
 import ssl
-import json
 import logging
 import asyncio
 import aiohttp
@@ -41,11 +40,19 @@ load_dotenv()
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 
 bot = Bot(token=TELEGRAM_BOT_TOKEN)
-logging.basicConfig(level=logging.INFO)
 router = Router()
 storage = MemoryStorage()
 dp = Dispatcher(storage=storage)
 dp.include_router(router)
+
+logging.basicConfig(
+    filename='bot.log',     # Имя файла, куда будут писаться логи
+    level=logging.INFO,     # Уровень логирования
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    encoding='utf-8'
+)
+
+logging.info("Бот запущен!")
 
 
 def create_ssl_context():

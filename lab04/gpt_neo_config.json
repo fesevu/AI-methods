@@ -1,11 +1,12 @@
 {
-          "max_new_tokens": 400,
-          "truncation": false,
+          "max_length": 1000,
+          "truncation": true,
           "num_return_sequences": 1,
-          "repetition_penalty": 1.5,
+          "repetition_penalty": 1.2,
           "temperature": 0.3,
-          "top_k": 100,
-          "top_p": 0.6,
+          "top_k": 50,
+          "top_p": 0.9,
           "do_sample": true,
-          "min_length": 200
+          "min_length": 150,
+          "num_beams": 2
 }
