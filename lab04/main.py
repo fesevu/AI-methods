@@ -411,7 +411,7 @@ async def what_is_kyc(callback_query: types.CallbackQuery) -> None:
     await bot.send_message(
         callback_query.from_user.id,
         "Подробнее",
-        reply_markup=get_altcoins_back_keyboard()
+        reply_markup=get_what_is_kyc_keyboard()
     )
     await callback_query.answer()
 
@@ -647,6 +647,9 @@ async def chat_with_model(message: types.Message, state: FSMContext) -> None:
     response: list = model_pipeline(full_prompt, **params)
     generated_text: str = response[0]["generated_text"].split(
         split_token)[-1].strip()
+
+    logging.info(f'Промпт: {full_prompt}')
+    logging.info(f'json ответ модели: {response}')
 
     await message.answer(
         f"Ответ от модели {'LLaMA-3' if model_choice ==
