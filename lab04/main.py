@@ -77,6 +77,8 @@ ssl_context: ssl.SSLContext | None = create_ssl_context()
 
 @router.message(Command(commands=['start', 'help']))
 async def send_welcome(message: types.Message) -> None:
+    logging.info(f'Received message from user {
+                 message.from_user.id}: {message.text}')
     """
     Функция для обработки команд /start и /help.
 
@@ -94,6 +96,8 @@ async def send_welcome(message: types.Message) -> None:
 
 @router.callback_query(lambda c: c.data == "free_chat")
 async def free_chat(callback_query: types.CallbackQuery) -> None:
+    logging.info(f'Received callback query from user {
+                 callback_query.from_user.id}: {callback_query.data}')
     """
     Функция для обработки нажатия кнопки 'Свободный чат'.
 
@@ -112,6 +116,8 @@ async def free_chat(callback_query: types.CallbackQuery) -> None:
 
 @router.callback_query(lambda c: c.data == "general_questions")
 async def general_questions(callback_query: types.CallbackQuery) -> None:
+    logging.info(f'Received callback query from user {
+                 callback_query.from_user.id}: {callback_query.data}')
     """
     Функция для обработки кнопки 'Общие вопросы о криптовалютах'.
 
@@ -130,6 +136,8 @@ async def general_questions(callback_query: types.CallbackQuery) -> None:
 
 @router.callback_query(lambda c: c.data == "crypto_question")
 async def crypto_question(callback_query: types.CallbackQuery) -> None:
+    logging.info(f'Received callback query from user {
+                 callback_query.from_user.id}: {callback_query.data}')
     """
     Функция для обработки кнопки 'Что такое криптовалюта'.
 
@@ -155,6 +163,8 @@ async def crypto_question(callback_query: types.CallbackQuery) -> None:
 
 @router.callback_query(lambda c: c.data == "bitcoin")
 async def bitcoin(callback_query: types.CallbackQuery) -> None:
+    logging.info(f'Received callback query from user {
+                 callback_query.from_user.id}: {callback_query.data}')
     """
     Функция для обработки кнопки 'Bitcoin'.
 
@@ -179,6 +189,8 @@ async def bitcoin(callback_query: types.CallbackQuery) -> None:
 
 @router.callback_query(lambda c: c.data == "stablecoin")
 async def stablecoin(callback_query: types.CallbackQuery) -> None:
+    logging.info(f'Received callback query from user {
+                 callback_query.from_user.id}: {callback_query.data}')
     """
     Функция для обработки кнопки 'Стейблкоины'.
 
@@ -203,6 +215,8 @@ async def stablecoin(callback_query: types.CallbackQuery) -> None:
 
 @router.callback_query(lambda c: c.data == "usdt")
 async def usdt(callback_query: types.CallbackQuery) -> None:
+    logging.info(f'Received callback query from user {
+                 callback_query.from_user.id}: {callback_query.data}')
     """
     Функция для обработки кнопки 'USDT'.
 
@@ -227,6 +241,8 @@ async def usdt(callback_query: types.CallbackQuery) -> None:
 
 @router.callback_query(lambda c: c.data == "usdс")
 async def usdc(callback_query: types.CallbackQuery) -> None:
+    logging.info(f'Received callback query from user {
+                 callback_query.from_user.id}: {callback_query.data}')
     """
     Функция для обработки кнопки 'USDС'.
 
@@ -251,6 +267,8 @@ async def usdc(callback_query: types.CallbackQuery) -> None:
 
 @router.callback_query(lambda c: c.data == "altcoins")
 async def altcoins(callback_query: types.CallbackQuery) -> None:
+    logging.info(f'Received callback query from user {
+                 callback_query.from_user.id}: {callback_query.data}')
     """
     Функция для обработки кнопки 'Альткоины'.
 
@@ -275,6 +293,8 @@ async def altcoins(callback_query: types.CallbackQuery) -> None:
 
 @router.callback_query(lambda c: c.data == "eth")
 async def eth(callback_query: types.CallbackQuery) -> None:
+    logging.info(f'Received callback query from user {
+                 callback_query.from_user.id}: {callback_query.data}')
     """
     Функция для обработки кнопки 'Ethereum (ETH)'.
 
@@ -299,6 +319,8 @@ async def eth(callback_query: types.CallbackQuery) -> None:
 
 @router.callback_query(lambda c: c.data == "ltc")
 async def ltc(callback_query: types.CallbackQuery) -> None:
+    logging.info(f'Received callback query from user {
+                 callback_query.from_user.id}: {callback_query.data}')
     """
     Функция для обработки кнопки 'Litecoine (LTC)'.
 
@@ -323,6 +345,8 @@ async def ltc(callback_query: types.CallbackQuery) -> None:
 
 @router.callback_query(lambda c: c.data == "reg_on_exchange")
 async def reg_on_exchange(callback_query: types.CallbackQuery) -> None:
+    logging.info(f'Received callback query from user {
+                 callback_query.from_user.id}: {callback_query.data}')
     """
     Функция для обработки кнопки 'Регистрация на бирже'.
 
@@ -348,6 +372,8 @@ async def reg_on_exchange(callback_query: types.CallbackQuery) -> None:
 
 @router.callback_query(lambda c: c.data == "bingx")
 async def bingx(callback_query: types.CallbackQuery) -> None:
+    logging.info(f'Received callback query from user {
+                 callback_query.from_user.id}: {callback_query.data}')
     """
     Функция для обработки кнопки 'BingX'.
 
@@ -371,6 +397,8 @@ async def bingx(callback_query: types.CallbackQuery) -> None:
 
 @router.callback_query(lambda c: c.data == "htx")
 async def htx(callback_query: types.CallbackQuery) -> None:
+    logging.info(f'Received callback query from user {
+                 callback_query.from_user.id}: {callback_query.data}')
     """
     Функция для обработки кнопки 'HTX'.
 
@@ -394,6 +422,8 @@ async def htx(callback_query: types.CallbackQuery) -> None:
 
 @router.callback_query(lambda c: c.data == "what_is_kyc")
 async def what_is_kyc(callback_query: types.CallbackQuery) -> None:
+    logging.info(f'Received callback query from user {
+                 callback_query.from_user.id}: {callback_query.data}')
     """
     Функция для обработки кнопки 'Что такое KYC?'.
 
@@ -418,6 +448,8 @@ async def what_is_kyc(callback_query: types.CallbackQuery) -> None:
 
 @router.callback_query(lambda c: c.data == "for_what_kyc")
 async def for_what_kyc(callback_query: types.CallbackQuery) -> None:
+    logging.info(f'Received callback query from user {
+                 callback_query.from_user.id}: {callback_query.data}')
     """
     Функция для обработки кнопки 'Зачем криптобиржам нужен KYC'.
 
@@ -449,6 +481,8 @@ async def for_what_kyc(callback_query: types.CallbackQuery) -> None:
 
 @router.callback_query(lambda c: c.data == "risk_kyc")
 async def risk_kyc(callback_query: types.CallbackQuery) -> None:
+    logging.info(f'Received callback query from user {
+                 callback_query.from_user.id}: {callback_query.data}')
     """
     Функция для обработки кнопки 'Какие риски связаны с прохождением KYC'.
 
@@ -549,6 +583,8 @@ generation_params_gpt_neo: dict = {
 
 @router.message()
 async def chat_with_model(message: types.Message, state: FSMContext) -> None:
+    logging.info(f'Received message from user {
+                 message.from_user.id}: {message.text}')
     """
     Генерация ответа модели на основе текущего ввода пользователя.
 
@@ -589,6 +625,8 @@ async def chat_with_model(message: types.Message, state: FSMContext) -> None:
 
 @router.callback_query(lambda c: c.data == "main_menu")
 async def back_to_main_menu(callback_query: types.CallbackQuery) -> None:
+    logging.info(f'Received callback query from user {
+                 callback_query.from_user.id}: {callback_query.data}')
     """
     Функция для обработки кнопки 'Главное меню'.
 
@@ -618,6 +656,8 @@ INTRO_PROMPT_GPT_NEO = (
 
 @router.message()
 async def chat_with_model(message: types.Message, state: FSMContext) -> None:
+    logging.info(f'Received message from user {
+                 message.from_user.id}: {message.text}')
     """
     Генерация ответа модели на основе текущего ввода пользователя.
 
@@ -650,6 +690,7 @@ async def chat_with_model(message: types.Message, state: FSMContext) -> None:
 
     logging.info(f'Промпт: {full_prompt}')
     logging.info(f'json ответ модели: {response}')
+    logging.info(f'Model response details: {response}')
 
     await message.answer(
         f"Ответ от модели {'LLaMA-3' if model_choice ==
