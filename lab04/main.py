@@ -543,22 +543,22 @@ async def choose_model(callback_query: types.CallbackQuery, state: FSMContext) -
 
 # Промпты для моделей
 
-INTRO_PROMPT_LLAMA = (
-    "Ты помощник в сфере криптовалют.Твоя задача — отвечать новичкам на вопросы о криптовалютах, "
-    "объясняя максимально точно и подробно, но простым языком.Если пользователь захочет, предоставь дополнительные подробности"
-)
-
-INTRO_PROMPT_GPT_NEO = (
+INTRO_PROMPT_LLAMA: str = (
     "Ты помощник в сфере криптовалют.Твоя задача — отвечать новичкам на вопросы о криптовалютах, "
     "объясняя максимально точно и подробно, но простым языком.Если пользователь захочет, предоставь дополнительные подробности"
 )
 
 # INTRO_PROMPT_GPT_NEO: str = (
-#     "You are an assistant specializing in cryptocurrencies. "
-#     "Your task is to answer beginners' questions about cryptocurrencies, "
-#     "explaining as accurately and thoroughly as possible in simple terms. "
-#     "Provide additional details if requested."
+#     "Ты помощник в сфере криптовалют.Твоя задача — отвечать новичкам на вопросы о криптовалютах, "
+#     "объясняя максимально точно и подробно, но простым языком.Если пользователь захочет, предоставь дополнительные подробности"
 # )
+
+INTRO_PROMPT_GPT_NEO: str = (
+    "You are an assistant specializing in cryptocurrencies. "
+    "Your task is to answer beginners' questions about cryptocurrencies, "
+    "explaining as accurately and thoroughly as possible in simple terms. "
+    "Provide additional details if requested."
+)
 
 
 @router.message()
@@ -589,11 +589,11 @@ async def chat_with_model(message: types.Message, state: FSMContext) -> None:
         pipeline = llama3_pipeline
         split_token: str = "Ответ:"
     else:
-        full_prompt: str = f"{INTRO_PROMPT_GPT_NEO}\n\nВопрос: {
-            message.text} \n\nОтвет:"
+        full_prompt: str = f"{INTRO_PROMPT_GPT_NEO}\n\nQuestion:: {
+            message.text} \n\nAnswer:"
         params: dict = generation_params_gpt_neo
         pipeline = gpt_neo_pipeline
-        split_token: str = "Ответ:"
+        split_token: str = "Answer:"
 
     # Генерация ответа
     response: list = pipeline(full_prompt, **params)

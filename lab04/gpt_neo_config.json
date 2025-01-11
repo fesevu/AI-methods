@@ -1,5 +1,5 @@
 {
-          "max_length": 700,
+          "max_length": 500,
           "truncation": true,
           "num_return_sequences": 1,
           "repetition_penalty": 1.2,
