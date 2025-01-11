@@ -1,5 +1,5 @@
 {
-          "max_length": 1000,
+          "max_length": 700,
           "truncation": true,
           "num_return_sequences": 1,
           "repetition_penalty": 1.2,
@@ -8,5 +8,6 @@
           "top_p": 0.9,
           "do_sample": true,
           "min_length": 150,
+          "no_repeat_ngram_size": 4,
           "num_beams": 2
 }

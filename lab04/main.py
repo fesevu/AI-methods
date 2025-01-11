@@ -107,7 +107,8 @@ async def free_chat(callback_query: types.CallbackQuery) -> None:
     Возвращает:
         None
     """
-    await callback_query.message.edit_text(
+    await bot.send_message(
+        callback_query.from_user.id,
         "Выберите модель для общения:",
         reply_markup=get_model_selection_keyboard()
     )
@@ -541,50 +542,27 @@ async def choose_model(callback_query: types.CallbackQuery, state: FSMContext) -
 
 
 # Промпты для моделей
-INTRO_PROMPT_LLAMA: str = (
-    "Ты помощник в сфере криптовалют. "
-    "Твоя задача — отвечать новичкам на вопросы о криптовалютах, "
-    "объясняя максимально точно и подробно, но простым языком. "
-    "Если пользователь захочет, предоставь дополнительные подробности."
+
+INTRO_PROMPT_LLAMA = (
+    "Ты помощник в сфере криптовалют.Твоя задача — отвечать новичкам на вопросы о криптовалютах, "
+    "объясняя максимально точно и подробно, но простым языком.Если пользователь захочет, предоставь дополнительные подробности"
 )
 
-INTRO_PROMPT_GPT_NEO: str = (
-    "You are an assistant specializing in cryptocurrencies. "
-    "Your task is to answer beginners' questions about cryptocurrencies, "
-    "explaining as accurately and thoroughly as possible in simple terms. "
-    "Provide additional details if requested."
+INTRO_PROMPT_GPT_NEO = (
+    "Ты помощник в сфере криптовалют.Твоя задача — отвечать новичкам на вопросы о криптовалютах, "
+    "объясняя максимально точно и подробно, но простым языком.Если пользователь захочет, предоставь дополнительные подробности"
 )
 
-# Параметры генерации для каждой модели
-generation_params_llama: dict = {
-    "max_length": 500,
-    "truncation": True,
-    "num_return_sequences": 1,
-    "repetition_penalty": 1.2,
-    "temperature": 0.3,
-    "top_k": 50,
-    "top_p": 0.9,
-    "do_sample": True,
-    "min_length": 150
-}
-
-generation_params_gpt_neo: dict = {
-    "max_new_tokens": 700,
-    "truncation": True,
-    "num_return_sequences": 1,
-    "repetition_penalty": 1.2,
-    "temperature": 0.3,
-    "top_k": 50,
-    "top_p": 0.9,
-    "do_sample": True,
-    "min_length": 200
-}
+# INTRO_PROMPT_GPT_NEO: str = (
+#     "You are an assistant specializing in cryptocurrencies. "
+#     "Your task is to answer beginners' questions about cryptocurrencies, "
+#     "explaining as accurately and thoroughly as possible in simple terms. "
+#     "Provide additional details if requested."
+# )
 
 
 @router.message()
 async def chat_with_model(message: types.Message, state: FSMContext) -> None:
-    logging.info(f'Received message from user {
-                 message.from_user.id}: {message.text}')
     """
     Генерация ответа модели на основе текущего ввода пользователя.
 
@@ -595,27 +573,37 @@ async def chat_with_model(message: types.Message, state: FSMContext) -> None:
     Возвращает:
         None
     """
+    # Логируем входящее сообщение
+    logging.info(f"Received message from user {
+                 message.from_user.id}: {message.text}")
+
+    # Получаем выбранную модель из контекста
     data: dict = await state.get_data()
     model_choice: str = data.get("model_choice", "llama3")
 
-    # Выбор промпта и параметров генерации
+    # Выбор модели, промпта и параметров генерации
     if model_choice == "llama3":
         full_prompt: str = f"{INTRO_PROMPT_LLAMA}\n\nВопрос: {
-            message.text}\n\nОтвет:"
+            message.text} \n\n Ответ:"
         params: dict = generation_params_llama
         pipeline = llama3_pipeline
         split_token: str = "Ответ:"
     else:
-        full_prompt: str = f"{INTRO_PROMPT_GPT_NEO}\n\nQuestion: {
-            message.text}\n\nAnswer:"
+        full_prompt: str = f"{INTRO_PROMPT_GPT_NEO}\n\nВопрос: {
+            message.text} \n\nОтвет:"
         params: dict = generation_params_gpt_neo
         pipeline = gpt_neo_pipeline
-        split_token: str = "Answer:"
+        split_token: str = "Ответ:"
 
+    # Генерация ответа
     response: list = pipeline(full_prompt, **params)
+    logging.info(f"Prompt: {full_prompt}")
+    logging.info(f"Model JSON response for user {
+                 message.from_user.id}: {response}")
     generated_text: str = response[0]["generated_text"].split(
         split_token)[-1].strip()
 
+    # Отправляем ответ пользователю
     await message.answer(
         f"Ответ от модели {'LLaMA-3' if model_choice ==
                            'llama3' else 'GPT-Neo'}:\n\n{generated_text}",
@@ -636,67 +624,12 @@ async def back_to_main_menu(callback_query: types.CallbackQuery) -> None:
     Возвращает:
         None
     """
-    await callback_query.message.edit_text(
+    await bot.send_message(
+        callback_query.from_user.id,
         "Главное меню",
         reply_markup=get_main_menu_keyboard()
     )
     await callback_query.answer()
-
-
-INTRO_PROMPT_LLAMA = (
-    "Ты помощник в сфере криптовалют.Твоя задача — отвечать новичкам на вопросы о криптовалютах, "
-    "объясняя максимально точно и подробно, но простым языком.Если пользователь захочет, предоставь дополнительные подробности."
-)
-
-INTRO_PROMPT_GPT_NEO = (
-    "Ты помощник в сфере криптовалют.Твоя задача — отвечать новичкам на вопросы о криптовалютах, "
-    "объясняя максимально точно и подробно, но простым языком.Если пользователь захочет, предоставь дополнительные подробности."
-)
-
-
-@router.message()
-async def chat_with_model(message: types.Message, state: FSMContext) -> None:
-    logging.info(f'Received message from user {
-                 message.from_user.id}: {message.text}')
-    """
-    Генерация ответа модели на основе текущего ввода пользователя.
-
-    Аргументы:
-        message (types.Message): Объект сообщения от пользователя.
-        state (FSMContext): Контекст машины состояний.
-
-    Возвращает:
-        None
-    """
-    data: dict = await state.get_data()
-    model_choice: str = data.get("model_choice", "llama3")
-
-    if model_choice == "llama3":
-        full_prompt: str = f"{INTRO_PROMPT_LLAMA}\n\nВопрос: {
-            message.text}\n\nОтвет:"
-        params: dict = generation_params_llama
-        model_pipeline = llama3_pipeline
-        split_token: str = "Ответ:"
-    else:
-        full_prompt: str = f"{INTRO_PROMPT_GPT_NEO}\n\nQuestion: {
-            message.text}\n\nAnswer:"
-        params: dict = generation_params_gpt_neo
-        model_pipeline = gpt_neo_pipeline
-        split_token: str = "Answer:"
-
-    response: list = model_pipeline(full_prompt, **params)
-    generated_text: str = response[0]["generated_text"].split(
-        split_token)[-1].strip()
-
-    logging.info(f'Промпт: {full_prompt}')
-    logging.info(f'json ответ модели: {response}')
-    logging.info(f'Model response details: {response}')
-
-    await message.answer(
-        f"Ответ от модели {'LLaMA-3' if model_choice ==
-                           'llama3' else 'GPT-Neo'}:\n\n{generated_text}",
-        reply_markup=get_models_back_keyboard()
-    )
 
 
 async def main() -> None:
