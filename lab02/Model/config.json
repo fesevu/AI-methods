@@ -1,11 +1,12 @@
 {
-          "max_length": 100,
-          "temperature": 0.1,
+          "max_length": 1500,
+          "temperature": 0.5,
           "top_p": 0.9,
+          "top_k": 70,
           "num_return_sequences": 1,
           "do_sample": true,
           "truncation": true,
-          "repetition_penalty": 1.2,
+          "repetition_penalty": 1.5,
           "num_beams": 2,
           "no_repeat_ngram_size": 4
 }
