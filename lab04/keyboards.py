@@ -112,7 +112,7 @@ def get_crypto_types_keyboard() -> InlineKeyboardMarkup:
             [
                 InlineKeyboardButton(
                     text="Стейблкоины",
-                    callback_data="stablecoins"
+                    callback_data="stablecoin"
                 ),
                 InlineKeyboardButton(
                     text="Альткоины",

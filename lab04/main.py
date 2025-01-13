@@ -590,7 +590,7 @@ async def chat_with_model(message: types.Message, state: FSMContext) -> None:
         split_token: str = "Ответ:"
     else:
         full_prompt: str = f"{INTRO_PROMPT_GPT_NEO}\n\nВопрос: {
-            message.text} \n\nОтветr:"
+            message.text} \n\nОтвет:"
         params: dict = generation_params_gpt_neo
         pipeline = gpt_neo_pipeline
         split_token: str = "Ответ:"
